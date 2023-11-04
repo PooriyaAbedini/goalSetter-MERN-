@@ -1,6 +1,11 @@
 import React from 'react'
 import { useState, useEffect } from 'react'
 import { FaSignInAlt } from 'react-icons/fa'
+import { useDispatch, useSelector } from 'react-redux'
+import { useNavigate } from 'react-router-dom'
+import { reset, login } from '../features/auth/authSlice'
+import { toast } from 'react-toastify'
+import Spinner from '../components/Spinner'
 
 function Login() {
     const [formData, setFormData] = useState({
@@ -10,16 +15,38 @@ function Login() {
 
     const {  email, password } = formData;
 
+    const navigate = useNavigate();
+	const dispatch = useDispatch();
+
+	const { user, isLoading, isError, isSuccess, message } = useSelector( state => state.auth);
+
+    useEffect( () => {
+        if(isError) {
+            toast.error(message)
+        } 
+        if(isSuccess || user) {
+            navigate('/')
+        }
+        dispatch(reset());
+    }, [user, isSuccess, isError, message])
+
     const onChange = (e) => { 
 		setFormData((prevState) => ({
 			...prevState,
 			[e.target.name]: e.target.value
 		}))
-	 }
+	}
 
-	 const onSubmit = (e) => {
+	const onSubmit = (e) => {
 		e.preventDefault()
-	 }
+
+        const userData = {email, password};
+        dispatch(login(userData));
+	}
+
+    if(isLoading) {
+        return <Spinner />
+    }
 
 
 	return (
@@ -29,7 +56,7 @@ function Login() {
 					<p>Please Fill The Required Fileds!</p>
 			</section>
 			<section className='form'>
-					<from onSubmit={onSubmit}>
+					<form onSubmit={onSubmit}>
                         <div className='form-group'>
                             <input 
                                 type='email' 
@@ -53,7 +80,7 @@ function Login() {
                         <div className='form-group'>
                             <button type='submit' className='btn btn-block'>Login</button>
                         </div>	
-					</from>
+					</form>
 			</section>
 		</>
 	)
