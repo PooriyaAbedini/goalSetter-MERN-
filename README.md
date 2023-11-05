@@ -1,6 +1,6 @@
 # goalSetter-MERN-
 MERN, JWT aut, Redux.
-This project is a good practice for developing MERN applications also using redux and redux-tookit for state management.
+This project was a good practice for developing MERN applications also using redux and redux-tookit for state management.
 .env you can use for checking final application:
 [
   NODE_ENV: development
