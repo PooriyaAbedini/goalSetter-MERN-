@@ -19,7 +19,7 @@ const setGoal = asyncHandler( async (req, res) => {
         res.status(400)
         throw new Error('Please enter a text field');
     }else {
-        const goal = await Goal.findOne({text : req.body.text});
+        const goal = await Goal.findOne({text : req.body.text, user: req.user._id});
         if(goal) res.status(200).json({message: 'This goal is already included!'});
         else {
             const goal = new Goal({
@@ -42,15 +42,13 @@ const updateGoal = asyncHandler( async (req, res) => {
         throw new Error('Goal Not Found!');
     }
     else {
-        const user = User.findById(req.user._id);
-
         //Check for user
-        if(!user) {
+        if(!req.user) {
             res.status(401)
             throw new Error('User not found')
         }
         //Make sure that logged in user matches the goal user
-        if(goalToUpdate.user.toString() !== user._id) {
+        if(goalToUpdate.user.toString() !== req.user._id) {
             res.status(401)
             throw new Error('User is not authorized!')
         }
@@ -68,7 +66,6 @@ const updateGoal = asyncHandler( async (req, res) => {
 //@access Private
 const deleteGoal = asyncHandler( async (req, res) => {
     const goalToDelete = await Goal.findOne({_id: req.params.id});
-    const user = await User.findById({_id: req.user._id});
 
     if(!goalToDelete) {
         res.status(400)
@@ -76,7 +73,7 @@ const deleteGoal = asyncHandler( async (req, res) => {
     }
 
      //Check for user
-     if(!user) {
+     if(!req.user) {
         res.status(401)
         throw new Error('User not found')
     }
